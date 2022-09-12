@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\BokingSeatController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PagesController;
+use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\SeatController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
