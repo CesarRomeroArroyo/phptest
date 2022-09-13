@@ -52,8 +52,9 @@ RUN cp docker/supervisor.conf /etc/supervisord.conf
 RUN cp docker/php.ini /usr/local/etc/php/conf.d/app.ini
 RUN cp docker/nginx.conf /etc/nginx/sites-enabled/default
 
-COPY docker/run /usr/local/bin/run
-RUN chmod +x /usr/local/bin/run
+COPY docker/run.sh /usr/local/bin/run.sh
+RUN chmod -R 777 /usr/local/bin/run.sh
+
 # PHP Error Log Files
 RUN mkdir /var/log/php
 RUN touch /var/log/php/errors.log && chmod 777 /var/log/php/errors.log
@@ -64,4 +65,4 @@ RUN composer dump-autoload
 #RUN chmod +x /var/www/docker/run.sh
 
 EXPOSE 80
-CMD ["/usr/local/bin/run"]
+ENTRYPOINT ["/usr/local/bin/run.sh"]
