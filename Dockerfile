@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     lua-zlib-dev \
     libmemcached-dev \
+    dos2unix \
     nginx
 
 
@@ -63,6 +64,8 @@ RUN touch /var/log/php/errors.log && chmod 777 /var/log/php/errors.log
 RUN composer install --optimize-autoloader --no-dev
 RUN composer dump-autoload
 #RUN chmod +x /var/www/docker/run.sh
+
+RUN dos2unix /usr/local/bin/run.sh
 
 EXPOSE 80
 ENTRYPOINT ["/usr/local/bin/run.sh"]
