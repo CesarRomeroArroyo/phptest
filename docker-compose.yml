@@ -2,19 +2,24 @@ version: '3.7'
 services:
 
     mysql: # 2do servici
-            image: mysql:5.7 # imagen de docker hub
-            container_name: mysql # nombre de referencia del servicio
-            restart: always # si tiene algun problema, reinicialo
-            tty: true  # aqui si le fallo joven xD, 👀 leo los comentarios
-            ports:
-                - 33069:3306 # puerto local:puerto del servicio
-            volumes:
-                - ./docker/database:/var/lib/mysql # carpeta local:carpeta de config de mysql
-            environment: # datos de configuracion del entorno
-                MYSQL_DATABASE: laravel_theater  # importante que tengan comillas
-                MYSQL_ROOT_PASSWORD: secret.root
-            networks:
-                - phptest
+        image: mysql:5.7 # imagen de docker hub
+        container_name: mysql # nombre de referencia del servicio
+        restart: always # si tiene algun problema, reinicialo
+        tty: true  # aqui si le fallo joven xD, 👀 leo los comentarios
+        ports:
+            - 33069:3306 # puerto local:puerto del servicio
+        volumes:
+            - ./docker/database:/var/lib/mysql # carpeta local:carpeta de config de mysql
+        healthcheck:
+            test: "/usr/bin/mysql --user=root --password=secret.root --execute \"SHOW DATABASES;\""
+            interval: 2s
+            timeout: 20s
+            retries: 10
+        environment: # datos de configuracion del entorno
+            MYSQL_DATABASE: laravel_theater  # importante que tengan comillas
+            MYSQL_ROOT_PASSWORD: secret.root
+        networks:
+            - default
 
     nginx:
         image: nginx:stable-alpine
@@ -30,23 +35,25 @@ services:
             - mysql
             - php
         networks:
-        - phptest
+            - default
 
     php: # 3er servicio
         build: # este se construira aqui mismo
             context: . # ruta de referencia ./
             dockerfile: Dockerfile # nombre del archivo de configuracion de la imagen
         container_name: php #
+        restart: on-failure
         volumes: # carpeta de proyecto local : carpeta del container que da vida a los archivos PHP
             - ./:/var/www
             - .env.example:/var/www/.env # archivo local / reflejado en archivo de la imagen
             - /var/www/vendor
-        depends_on:
-            - mysql
         ports:
             - 9000:80 # ya te la sabes 😉
+        depends_on:
+            mysql:
+                condition: service_healthy
         networks:
-            - phptest # red
+            - default # red
 
 networks: # declaracion de la red
-  - phptest
+  default:

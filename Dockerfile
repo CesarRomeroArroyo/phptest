@@ -64,4 +64,4 @@ RUN composer dump-autoload
 #RUN chmod +x /var/www/docker/run.sh
 
 EXPOSE 80
-ENTRYPOINT ["run"]
+CMD ["/usr/local/bin/run"]
