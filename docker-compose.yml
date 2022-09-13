@@ -1,0 +1,52 @@
+version: '3.7'
+services:
+
+    mysql: # 2do servici
+            image: mysql:5.7 # imagen de docker hub
+            container_name: mysql # nombre de referencia del servicio
+            restart: always # si tiene algun problema, reinicialo
+            tty: true  # aqui si le fallo joven xD, 👀 leo los comentarios
+            ports:
+                - 33069:3306 # puerto local:puerto del servicio
+            volumes:
+                - ./docker/database:/var/lib/mysql # carpeta local:carpeta de config de mysql
+            environment: # datos de configuracion del entorno
+                MYSQL_DATABASE: laravel_theater  # importante que tengan comillas
+                MYSQL_ROOT_PASSWORD: secret.root
+            networks:
+                - phptest
+
+    nginx:
+        image: nginx:stable-alpine
+        container_name: nginx # nombre para referirse al servicio
+        ports:
+            - 8000:80 # puerto de mi pc:puerto del servicio
+        volumes:
+            - .:/var/www # carpeta local/ vincula a carpeta de nginx
+            - ./docker/nginx.conf:/etc/nginx/conf.d/nginx.conf # archivo local / reflejado en archivo de la imagen
+            - .env.example:/var/www/.env # archivo env
+            - /var/www/vendor
+        depends_on:
+            - mysql
+            - php
+        networks:
+        - phptest
+
+    php: # 3er servicio
+        build: # este se construira aqui mismo
+            context: . # ruta de referencia ./
+            dockerfile: Dockerfile # nombre del archivo de configuracion de la imagen
+        container_name: php #
+        volumes: # carpeta de proyecto local : carpeta del container que da vida a los archivos PHP
+            - ./:/var/www
+            - .env.example:/var/www/.env # archivo local / reflejado en archivo de la imagen
+            - /var/www/vendor
+        depends_on:
+            - mysql
+        ports:
+            - 9000:80 # ya te la sabes 😉
+        networks:
+            - phptest # red
+
+networks: # declaracion de la red
+  - phptest
