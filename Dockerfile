@@ -45,7 +45,7 @@ RUN useradd -u 1000 -ms /bin/bash -g www www
 COPY --chown=www:www-data . /var/www
 
 # add root to www group
-RUN chmod -R ug+w /var/www/storage
+
 RUN chmod -R 777 /var/www
 # Copy nginx/php/supervisor configs
 COPY .env.example /var/www/.env
